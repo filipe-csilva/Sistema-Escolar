@@ -1,58 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema Escolar
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Projeto de um sistema de gestão escolar construído com Laravel. O repositório está na etapa inicial de desenvolvimento, com a estrutura do framework e as ferramentas de desenvolvimento configuradas.
 
-## About Laravel
+## Estado atual
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Página inicial padrão do Laravel.
+- Modelo de usuário com factory e seeder.
+- Migrations de usuários, recuperação de senha, sessões, cache e filas.
+- Testes iniciais com Pest.
+- Compilação de CSS e JavaScript com Vite.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Os módulos de alunos, professores, turmas, matrículas, notas e frequência ainda não foram implementados. Também não há telas de login ou painel administrativo.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tecnologias e requisitos
 
-## Learning Laravel
+| Ferramenta | Versão usada no projeto |
+| --- | --- |
+| PHP | 8.5 |
+| Laravel | 13 |
+| Composer | 2 |
+| Node.js | 24 no ambiente de desenvolvimento; o Vite instalado aceita `^20.19.0` ou `>=22.12.0` |
+| Vite | 8 |
+| Tailwind CSS | 4 |
+| Pest | 5 |
+| Banco de dados local | SQLite |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+O PHP precisa das extensões exigidas pelas dependências, incluindo `pdo_sqlite` e `sqlite3` para o banco local. As versões exatas das dependências estão registradas em `composer.lock` e `package-lock.json`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalação local
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Obter o projeto
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/filipe-csilva/Sistema-Escolar.git
+cd Sistema-Escolar
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Instalar as dependências
 
-## Contributing
+```bash
+composer install
+npm ci
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+O comando `npm ci` usa as versões do arquivo de lock. O projeto mantém scripts de instalação de pacotes npm desativados em `.npmrc`.
 
-## Code of Conduct
+### 3. Preparar o ambiente e o banco
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Os comandos abaixo criam o `.env` e o banco SQLite apenas se os arquivos ainda não existirem:
 
-## Security Vulnerabilities
+```bash
+php -r "file_exists('.env') || copy('.env.example', '.env');"
+php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
+php artisan key:generate --no-interaction
+php artisan migrate --no-interaction
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+O `.env.example` usa `DB_CONNECTION=sqlite`. Sessões, cache e filas também utilizam o banco de dados por padrão. Para usar outro banco, ajuste as variáveis `DB_*` no `.env` antes de executar as migrations.
 
-## License
+Execute a geração da chave na instalação inicial. Preserve a chave existente em ambientes já configurados.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 4. Iniciar o desenvolvimento
+
+```bash
+composer run dev
+```
+
+Esse script usa o comando de desenvolvimento integrado do Laravel. Acesse o endereço informado pelo servidor no terminal.
+
+Como alternativa, execute cada comando em um terminal separado:
+
+```bash
+php artisan serve --no-interaction
+```
+
+```bash
+npm run dev
+```
+
+Se precisar processar tarefas em fila, inicie também:
+
+```bash
+php artisan queue:work --no-interaction
+```
+
+### Windows / PowerShell
+
+Se a política de execução bloquear `npm.ps1`, use `npm.cmd` nos comandos npm, por exemplo:
+
+```powershell
+npm.cmd ci
+npm.cmd run dev
+npm.cmd run build
+```
+
+## Testes
+
+Para executar a suíte:
+
+```bash
+composer test
+```
+
+Para executar apenas um arquivo:
+
+```bash
+php artisan test --compact tests/Feature/ExampleTest.php
+```
+
+A configuração em `phpunit.xml` utiliza SQLite em memória, cache e sessões em memória e execução síncrona de filas. A suíte atual contém dois testes de exemplo; a cobertura dos módulos escolares deverá acompanhar a implementação das funcionalidades.
+
+## Build dos assets
+
+```bash
+npm run build
+```
+
+Os arquivos compilados são gerados em `public/build`. Se aparecer o erro de manifesto do Vite ausente, execute esse comando ou mantenha `npm run dev` em execução durante o desenvolvimento.
+
+## Estrutura do projeto
+
+| Diretório | Responsabilidade |
+| --- | --- |
+| `app/` | Modelos, controllers e providers da aplicação |
+| `bootstrap/` | Inicialização da aplicação |
+| `config/` | Configurações dos serviços e do framework |
+| `database/` | Migrations, factories e seeders |
+| `public/` | Ponto de entrada web e arquivos públicos |
+| `resources/` | Views Blade, CSS e JavaScript |
+| `routes/` | Rotas web e comandos de console |
+| `storage/` | Logs, cache e arquivos gerados em execução |
+| `tests/` | Testes de funcionalidade e de unidade |
+
+## Fluxo de contribuição
+
+Crie uma branch para cada alteração e descreva o comportamento implementado no commit. Antes de enviar mudanças, execute os testes e, quando houver alterações no frontend, o build dos assets.
+
+As orientações de desenvolvimento estão em [AGENTS.md](AGENTS.md). As skills do projeto estão em `.agents/skills/`.
+
+O `.gitignore` exclui `.env`, dependências instaladas, banco SQLite local e assets compilados. Mantenha credenciais fora dos arquivos versionados e use `.env.example` como modelo de configuração, sem segredos.
